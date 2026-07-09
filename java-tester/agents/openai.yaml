@@ -1,0 +1,4 @@
+interface:
+  display_name: "Java Tester"
+  short_description: "Comprehensive Java test guidance"
+  default_prompt: "Use $java-tester to add comprehensive tests to this Java project."

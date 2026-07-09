@@ -1,0 +1,4 @@
+interface:
+  display_name: "Front-end Angular Tester"
+  short_description: "Pragmatic Angular/frontend test guidance"
+  default_prompt: "Use $front-end-angular-tester to design comprehensive but maintainable Angular frontend tests."
