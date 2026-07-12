@@ -1,6 +1,48 @@
 # Java Testing Tooling
 
-Use Context7 for current docs before changing version-specific syntax, dependency coordinates, annotations, extensions, or configuration.
+## Contents
+
+- Current documentation
+- Build and test command discovery
+- Test failure classification
+- Default tool choices
+- JUnit Jupiter patterns
+- Mockito patterns
+- Spring Boot and Security testing
+- Database seeding and cleanup
+- Testcontainers patterns
+- API and contract tests
+- Coverage stopping heuristic
+
+## Current Documentation
+
+Use Context7 for current docs before changing version-specific syntax, dependency coordinates, annotations, extensions, or configuration. If Context7 is unavailable or cannot resolve the library, consult the library's official documentation and state that fallback in the final report. Do not infer dependency versions from memory.
+
+## Build and Test Command Discovery
+
+Inspect the repository before choosing a command:
+
+- Prefer `mvnw` or `gradlew` over a system Maven or Gradle installation.
+- Identify the owning module from `pom.xml`, `settings.gradle`, `settings.gradle.kts`, and module build files.
+- Reuse custom test tasks, Maven profiles, source sets, tags, and CI commands instead of assuming standard names.
+- Check Surefire versus Failsafe configuration and Gradle `Test` tasks before separating unit and integration tests.
+- In a multi-module build, run the owning module and required dependencies rather than the entire repository when the build supports it.
+- Never add or upgrade a plugin merely to obtain a narrower command unless the user asks for build changes.
+
+Run a single test class or method when practical, then its module suite, then broader affected suites when risk warrants it. Do not claim full verification when only a filtered test ran.
+
+## Test Failure Classification
+
+Classify a failing check before changing code:
+
+- **Change-related regression:** the failure is caused by the requested or current changes. Fix it within scope and rerun the narrow test.
+- **Production defect exposed by a valid test:** preserve the test and report or fix the defect according to the user's requested scope.
+- **Incorrect or brittle test:** correct assumptions, isolation, timing, fixtures, or assertions without weakening the behavior being protected.
+- **Pre-existing failure:** confirm it against the appropriate baseline when feasible; do not label it pre-existing from appearance alone.
+- **Environmental failure:** report missing Docker, credentials, ports, services, toolchains, or dependency access separately from assertion failures.
+- **Suspected flake:** rerun narrowly and inspect shared state, time, randomness, concurrency, ordering, and asynchronous waits. Do not hide it with retries unless the retry represents intended product behavior.
+
+When a test passes alone but fails in the suite, investigate leaked state, order dependence, resource collisions, and parallel execution before changing assertions.
 
 ## Default Tool Choices
 
