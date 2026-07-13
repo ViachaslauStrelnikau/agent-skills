@@ -61,7 +61,7 @@ Prioritize low-risk routes first, followed by representative complex routes. Lea
 | `SessionAware` and similar interfaces | Explicit session access; minimize session state |
 | Struts file upload | Spring multipart handling |
 
-Spring MVC supports annotated mappings, request-body conversion and validation, explicit responses, and centralized exception handling. Use only APIs available in the temporary Spring 3.2 baseline during phase one. See the Spring documentation for [`@RequestMapping`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMapping.html) and [`@RequestBody`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestBody.html).
+Spring MVC supports annotated mappings, request-body conversion and validation, explicit responses, and centralized exception handling. Use only APIs available in the temporary Spring 3.2 baseline during phase one. Before selecting or using Spring APIs such as `@RequestMapping` and `@RequestBody`, detect the project's exact effective Spring version and resolve the matching version-specific documentation through Context7. Do not rely on unversioned documentation or assume that APIs from a newer Spring release are available.
 
 ## 5. Per-route procedure
 
@@ -168,7 +168,7 @@ Catalog rules:
 - Replace security-related Struts interceptors with Spring Security rules.
 - Maintain a single authoritative CORS configuration.
 - Do not run conflicting Tomcat and Spring CORS policies.
-- Allow only explicit trusted origins, especially when credentials are enabled. See [Spring MVC CORS configuration](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/config/annotation/WebMvcConfigurer.html).
+- Allow only explicit trusted origins, especially when credentials are enabled. Verify the CORS configuration API against the exact effective Spring version through Context7 before implementing it.
 - Preserve correlation IDs, audit events, locale selection, and logging context.
 - Return consistent sanitized errors without exposing stack traces.
 
