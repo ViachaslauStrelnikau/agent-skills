@@ -27,7 +27,7 @@ Migrate one route and every associated JSP, JavaScript caller, and external clie
 
 | Request | Action |
 |---|---|
-| Analyze or review | Report route coupling, compatibility risks, missing clients, and evidence; do not edit. |
+| Analyze or review | Report route coupling, compatibility risks, and missing clients. List required contract, security, and regression evidence as three separate items; do not edit. |
 | Plan | Produce ordered slices, contracts, catalog entries, tests, rollback, and completion gates. |
 | Diagnose | Reproduce behavior and identify the Struts/Spring boundary; do not fix unless requested. |
 | Implement | Change the smallest complete route-and-client slice and verify it. |
