@@ -12,13 +12,13 @@ Migrate one route and every associated JSP, JavaScript caller, and external clie
 ## Workflow
 
 1. Classify the request as analysis, planning, diagnosis, implementation, or review. Stay read-only unless implementation is requested.
-2. Inspect build metadata or JARs, `web.xml`, Struts and Spring configuration, filters, security rules, actions, controllers, JSPs, JavaScript, tests, and known consumers.
+2. Inspect build metadata/JARs, `web.xml`, Struts/Spring configuration, filters, security, actions, controllers, JSPs, JavaScript, tests, and consumers.
 3. Establish effective framework versions. If duplicate JARs exist, report uncertainty rather than guessing. Use Context7 to resolve and fetch version-current Struts and Spring documentation before applying framework-specific APIs.
 4. Inventory routes and select one low-risk slice. Capture method, path, parameters, payload, validation, security, session, errors, redirects, uploads, view, and consumers.
 5. Write characterization and contract tests before migration changes.
-6. Replace the action with a thin Spring MVC controller that delegates to existing services. Use explicit request, response, and view models.
+6. Replace the action with a thin Spring MVC controller delegating to existing services. Use explicit request, response, and view models.
 7. Rework the slice's JSP and clients to remove Struts tags, ValueStack access, action names, implicit binding, and response assumptions without changing visible behavior.
-8. When the canonical route changes, retain the legacy route as a Spring mapping or server-side adapter. Do not redirect a request when doing so can change its method, body, authentication, or status semantics.
+8. When the canonical route changes, retain the legacy route as a Spring mapping or server-side adapter. Do not redirect when doing so can change method, body, authentication, or status semantics.
 9. Copy `assets/route-mapping.yaml` into the target project and update it in the same change. Keep the legacy mapping while any registered client is pending.
 10. Run narrow controller/client tests, then relevant regression, security, upload, and end-to-end checks. Remove migrated Struts configuration only after both routes pass and traffic confirms the old route can retire.
 11. Remove Struts filters, plugins, configuration, tags, and JARs only after every route and client passes the removal gate.
