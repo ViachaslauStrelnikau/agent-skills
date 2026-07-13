@@ -1,0 +1,4 @@
+interface:
+  display_name: "Migrate Struts 2 to Spring"
+  short_description: "Route-safe Struts 2 to Spring migration"
+  default_prompt: "Use $migrate-struts2-to-spring to plan or implement a behavior-preserving route migration from Struts 2 to Spring MVC."
