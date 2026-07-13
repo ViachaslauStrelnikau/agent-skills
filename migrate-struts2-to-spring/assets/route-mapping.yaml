@@ -1,0 +1,28 @@
+version: 1
+
+routes:
+  - id: customer-search
+    owner: customer-team
+    legacy:
+      method: POST
+      path: /customer/search.do
+    canonical:
+      method: POST
+      path: /rest/customers/search
+    compatibility:
+      mode: server-side-alias
+      legacy_route_active: true
+      retirement_after: 2027-01-31
+    contract:
+      breaking: false
+      request_changes: none
+      response_changes: none
+      authentication: existing-session
+    backend_status: migrated
+    clients:
+      - name: customer-jsp
+        owner: web-team
+        status: migrated
+      - name: reporting-client
+        owner: reporting-team
+        status: pending
