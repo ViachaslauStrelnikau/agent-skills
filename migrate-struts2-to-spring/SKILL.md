@@ -20,6 +20,29 @@ states its purpose and describes every parameter with `@param`; include
 `@return` when a returned value has a meaningful contract. Do not comment
 obvious syntax, restate method names, or add large block comments.
 
+## Logging checkpoint
+
+Review production logging while the legacy and migrated flows are both fresh:
+
+- Preserve meaningful legacy operational, business, security, and audit events.
+- Rely on centralized HTTP logging for routine request lifecycle information
+  and on the global exception handler for consistent unhandled-exception logs.
+- Verify that centralized logs or metrics distinguish canonical `/rest/...`
+  traffic from legacy compatibility traffic.
+- Do not add routine controller or service method-entry or method-exit events.
+  Do not require every new class to declare a logger.
+- Add service events for significant business operations, state changes,
+  integrations, retries, rejected operations, unusual conditions, and failures
+  that are not already captured with sufficient context.
+- Include safe, stable identifiers such as document, operation, client, user,
+  and correlation IDs when available.
+- Never log credentials, tokens, secrets, complete personal data, sensitive
+  document contents, or complete request and response bodies.
+- Avoid duplicate events and repeated stack traces across filters, controllers,
+  services, repositories, integration clients, and exception handlers.
+- Treat the logging review as migration acceptance evidence. Use
+  `$add-production-logging` for a detailed module or application audit.
+
 ## Workflow
 
 1. Classify the request as analysis, planning, diagnosis, implementation, or review. Stay read-only unless implementation is requested.
@@ -32,8 +55,9 @@ obvious syntax, restate method names, or add large block comments.
 8. When the canonical route changes, retain the legacy route as a Spring mapping or server-side adapter. Do not redirect when doing so can change method, body, authentication, or status semantics.
 9. Copy `assets/route-mapping.yaml` into the target project and update it in the same change. Keep the legacy mapping while any registered client is pending.
 10. Add the required concise comments and Javadoc while the migrated behavior is fresh; verify that non-obvious parameters are described.
-11. Run narrow controller/client tests, then relevant regression, security, upload, and end-to-end checks. Remove migrated Struts configuration only after both routes pass and traffic confirms the old route can retire.
-12. Remove Struts filters, plugins, configuration, tags, and JARs only after every route and client passes the removal gate.
+11. Apply the logging checkpoint while the legacy decisions and failure paths are known. Record useful events preserved or added and intentional omissions.
+12. Run narrow controller/client tests, then relevant regression, security, upload, and end-to-end checks. Remove migrated Struts configuration only after both routes pass and traffic confirms the old route can retire.
+13. Remove Struts filters, plugins, configuration, tags, and JARs only after every route and client passes the removal gate.
 
 ## Task modes
 
@@ -60,4 +84,6 @@ obvious syntax, restate method names, or add large block comments.
 
 ## Handoff
 
-State the migrated route, compatibility route, clients updated, catalog path, tests run, remaining consumers, rollback method, and retirement gate.
+State the migrated route, compatibility route, clients updated, catalog path,
+logging review and intentional omissions, tests run, remaining consumers,
+rollback method, and retirement gate.
