@@ -9,6 +9,17 @@ description: Use when Codex needs to analyze, plan, implement, diagnose, or revi
 
 Migrate one route and every associated JSP, JavaScript caller, and external client as a functional slice. Preserve observable behavior during Struts removal; modernize Spring, Java, and the container afterward.
 
+## Comment rule
+
+Write concise comments that explain migration-specific intent a maintainer cannot
+reliably infer from the code: legacy compatibility behavior, protocol or
+payload quirks, business rules retained for parity, and non-obvious security,
+session, validation, or error-handling decisions. For every new or materially
+changed controller, endpoint, or public service method, add short Javadoc that
+states its purpose and describes every parameter with `@param`; include
+`@return` when a returned value has a meaningful contract. Do not comment
+obvious syntax, restate method names, or add large block comments.
+
 ## Workflow
 
 1. Classify the request as analysis, planning, diagnosis, implementation, or review. Stay read-only unless implementation is requested.
@@ -20,8 +31,9 @@ Migrate one route and every associated JSP, JavaScript caller, and external clie
 7. Rework the slice's JSP and clients to remove Struts tags, ValueStack access, action names, implicit binding, and response assumptions without changing visible behavior.
 8. When the canonical route changes, retain the legacy route as a Spring mapping or server-side adapter. Do not redirect when doing so can change method, body, authentication, or status semantics.
 9. Copy `assets/route-mapping.yaml` into the target project and update it in the same change. Keep the legacy mapping while any registered client is pending.
-10. Run narrow controller/client tests, then relevant regression, security, upload, and end-to-end checks. Remove migrated Struts configuration only after both routes pass and traffic confirms the old route can retire.
-11. Remove Struts filters, plugins, configuration, tags, and JARs only after every route and client passes the removal gate.
+10. Add the required concise comments and Javadoc while the migrated behavior is fresh; verify that non-obvious parameters are described.
+11. Run narrow controller/client tests, then relevant regression, security, upload, and end-to-end checks. Remove migrated Struts configuration only after both routes pass and traffic confirms the old route can retire.
+12. Remove Struts filters, plugins, configuration, tags, and JARs only after every route and client passes the removal gate.
 
 ## Task modes
 
