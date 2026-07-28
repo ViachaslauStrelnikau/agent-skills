@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hibernate Criteria to JPA Criteria"
+  short_description: "Migrate legacy Hibernate Criteria queries"
+  default_prompt: "Use $hibernate-criteria-to-jpa-criteria to migrate these legacy Hibernate Criteria queries to JPA Criteria API."

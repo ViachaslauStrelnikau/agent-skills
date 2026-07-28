@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add Production Logging"
+  short_description: "Purposeful production logging and observability"
+  default_prompt: "Use $add-production-logging to audit and improve purposeful production logging for this code scope without changing business behavior."
