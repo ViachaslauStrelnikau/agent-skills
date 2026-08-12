@@ -1,0 +1,4 @@
+interface:
+  display_name: "Struts2 to Spring Migration Quality Gate"
+  short_description: "Verify migrated behavior in the running app"
+  default_prompt: "Use $struts2-to-spring-migration-quality-gate to verify the functionality migrated in the current migration step."
