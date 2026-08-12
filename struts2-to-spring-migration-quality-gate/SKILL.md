@@ -44,6 +44,8 @@ Before doing a static review, search narrowly for instructions whose names or co
 
 Follow any document-loading or index-navigation procedure defined by the discovered project instructions. Load only the current ticket, route records, acceptance criteria, checkpoint, and diff required by that procedure. Treat relevant instructions as authoritative unless they conflict with higher-level instructions. Apply their applicable checks, record that they were found, and avoid repeating equivalent static checks. Always continue with this skill's runtime verification.
 
+When multiple migration-rule sources overlap, follow explicit project-defined precedence first. Otherwise prefer current durable migration records and indexes over producer-side skill instructions or bundled examples. Do not silently merge conflicting records; if a conflict affecting the route or expected behavior cannot be resolved, record it and mark the affected verification `INCOMPLETE`.
+
 Do not import assumptions, paths, conventions, or infrastructure from another project.
 
 ### Fallback changed-files review
@@ -71,6 +73,7 @@ Inspect only relevant project instructions and configuration to learn:
 - base URLs, environment variables, test data, and test users;
 - authentication steps or an available authenticated session;
 - existing functional or E2E scenarios;
+- availability of the bundled Browser skill and authorized Developer mode/CDP access;
 - existing `playwright.config.*`, Playwright E2E specs, authentication setup, fixtures, base URL, and project scripts or CLI commands that run them.
 
 Reuse a running application and project-defined procedures. Start local development/test services only when documented and safe. Never target production or an unconfirmed shared environment.
@@ -83,7 +86,7 @@ Do not invent credentials. If authentication instructions or a reusable session 
 
 ## Build and Automated Tests
 
-Run the smallest useful checks first: affected-module compilation, directly related unit/controller/integration tests, migration tests, or feature E2E tests. Run a repository-wide suite only when project rules or the change's blast radius require it.
+Run the smallest useful checks first: affected-module compilation, directly related unit/controller/integration tests, migration tests, or feature E2E tests. If the project exposes no narrower compile or build target, run the smallest relevant project-defined test suite. Run a repository-wide suite only when project rules or the change's blast radius require it.
 
 Record commands and outcomes concisely. A successful build is supporting evidence, never proof that the migration works. If a required check cannot run, explain why and reflect the gap in the final outcome. Runtime verification may proceed against an already running environment when project rules permit it.
 
@@ -113,7 +116,7 @@ Capture only request and response fragments needed as evidence. Do not dump secr
 
 ### Level B — Browser
 
-Use Playwright and reuse the project's discovered configuration, E2E specs, authentication setup, fixtures, base URL, and conventions. Prefer a connected Playwright MCP capability. Otherwise use the project's existing Playwright script or CLI setup. Do not improvise an unrelated browser harness. Apply the same mechanism when Level C includes a browser. If neither option exists, mark required browser evidence `INCOMPLETE`.
+Use the bundled Browser skill when available and follow its browser-selection and authentication procedures. Use its Playwright automation surface and, when available and authorized, Developer mode/CDP to collect the required UI, network, console, page-error, transport-failure, and HTTP-status evidence. If the Browser skill is unavailable or cannot capture the required evidence, reuse the project's existing Playwright configuration, specs, authentication setup, fixtures, base URL, and script or CLI command. Do not improvise an unrelated browser harness. Apply the same mechanism when Level C includes a browser. If neither mechanism is available, mark required browser evidence `INCOMPLETE`.
 
 Open the application, authenticate through documented means or an existing session, navigate to the feature, and perform the actual migrated action. A page-open smoke test is insufficient. Capture the relevant browser-initiated request and response, including XHR/fetch when applicable; visible UI behavior after the action; console messages and uncaught page errors; transport failures from `requestfailed`; and unexpected HTTP error statuses from response events. Playwright does not emit `requestfailed` for completed 4xx/5xx responses, so inspect response statuses separately. Verify response-shape compatibility and cover the material interaction: for example submit the form, execute the search, populate the grid, change the filter, open the dependent control, or generate the report.
 
@@ -129,7 +132,7 @@ Use dedicated temporary test data in a development/test environment. Avoid impor
 
 Complete every safe automated check. Give numbered manual steps with preconditions, actions, and expected results for the remainder. Never label partially verified required behavior as `PASS`.
 
-If Playwright cannot reach the application or authenticate, record the exact attempt and failure reason. Retain the required B or C level and return `INCOMPLETE`; do not downgrade environment unavailability to D.
+If the bundled Browser skill and project Playwright fallback cannot reach the application, authenticate, or capture the required evidence, record each exact attempt and failure reason. Retain the required B or C level and return `INCOMPLETE`; do not downgrade environment unavailability to D.
 
 ## Verify Required Migration Surfaces
 
