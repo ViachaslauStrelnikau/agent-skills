@@ -86,7 +86,7 @@ runtimes use, so porting is a matter of the front matter and the install path.
 
 ## Where these came from
 
-The migration these were built for currently has **621 routes catalogued, 601 of them Spring-owned**,
+The migration these were built for currently has **621 routes catalogued, 607 of them Spring-owned**,
 349 with test or live-runtime verification, and 31 legacy action classes remaining, against a suite
 of roughly 2,000 test files. Every route carries a contract record, a compatibility alias, and an
 explicit list of what has *not* been verified yet.
