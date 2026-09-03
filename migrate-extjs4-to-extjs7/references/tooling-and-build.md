@@ -198,7 +198,7 @@ The properties that matter here:
 Preferred over the desktop Upgrade Adviser because it runs in CI and produces a diffable report.
 Conditional, though: it needs an authenticated registry, so run it when that is available and record
 it as unavailable with the reason when it is not. Code inspection does not wait on registry
-approval — see the fallback in the setup notes below, and step 5 in `SKILL.md`.
+approval — see the fallback in the setup notes below, and phase 0 in `SKILL.md`.
 
 ```
 npm login --registry=https://sencha.myget.org/F/extjs-upgrade-adviser/npm/ --scope=@sencha

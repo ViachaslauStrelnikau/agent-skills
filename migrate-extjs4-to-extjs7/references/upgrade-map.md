@@ -49,6 +49,20 @@ Three worked examples of why this matters:
   the part that needs real work, because those are private-ish internals of a class the framework no
   longer maintains.
 
+## 0a. Attributing breakage across three releases
+
+"Direct 4 to 7" means one released target, not one mechanical transformation. A direct hop inherits
+every breaking change from three major releases at once, so cumulative breakage is hard to
+attribute: a failure could belong to any of them. Two ways to recover attribution:
+
+1. **Bucket the findings by version.** Run the ESLint plugin, or the audit script, once per
+   intermediate target and diff the reports. Work can then be planned as "the 4-to-5 work", "the
+   5-to-6 work", without installing an intermediate framework. Do this by default.
+2. **A throwaway intermediate build**, only when a specific class of breakage resists attribution.
+   Nothing from that branch ships or merges.
+
+Neither changes the released target, and neither is an excuse to ship an intermediate version.
+
 ## 1. Environment and boot
 
 | Ext 4 | Ext 7 |

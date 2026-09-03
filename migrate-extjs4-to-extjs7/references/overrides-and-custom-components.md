@@ -140,13 +140,37 @@ UX classes were absorbed, replaced, or dropped. The two most commonly hit:
 - `Ext.dom.Query` is no longer required by default.
 - Listener priority is numeric `priority`; the `onBefore` / `onAfter` family is deprecated.
 
-## 7. Definition of done for this area
+## 7. Comments and JSDoc
+
+The migration's comment rule lives here because four of the five things it requires documentation
+for are this document's subject matter.
+
+Write concise comments that explain upgrade-specific intent a maintainer cannot infer from the code:
+why an override still exists, which framework behavior changed underneath a workaround, payload or
+id-format quirks the server depends on, and non-obvious layout, focus, or event-timing decisions. Do
+not comment obvious syntax, restate method names, or leave large commented-out Ext 4 blocks.
+
+A short JSDoc block stating what framework behavior is involved and which Ext version last validated
+it is **required only** for:
+
+- retained or reworked framework overrides;
+- any dependency on a private or undocumented framework member;
+- compatibility shims and temporary loader workarounds;
+- custom components whose behavior had to change because of the framework upgrade;
+- non-obvious server-contract preservation — a writer or parameter setting that exists only to keep
+  the Ext 4 wire format (`grid-and-data.md`).
+
+A view that migrated cleanly gets no migration comment. On a codebase with hundreds of views, a
+blanket documentation requirement produces noise that hides the entries that matter. Write these
+while the reasoning is fresh, in the slice that created them.
+
+## 8. Definition of done for this area
 
 - Every inventory entry is in a terminal state: deleted, ported, or replaced by a supported API.
 - Every application base class in the top of the section 2a ranking is migrated and verified through
   at least two subclasses, and was read by hand rather than cleared by the linter.
-- Every retained override and custom component carries the JSDoc required by the skill's comment
-  rule: what framework behavior it modifies, and which Ext version last validated it.
+- Every retained override and custom component carries the JSDoc required by section 7: what
+  framework behavior it modifies, and which Ext version last validated it.
 - No override targets a private member without a comment explaining why no supported alternative
   exists.
 - The lint report shows no override or private-member finding that is not accounted for in the

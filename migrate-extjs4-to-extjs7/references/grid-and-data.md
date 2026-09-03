@@ -238,3 +238,7 @@ column filter, not on the plugin.
    encoded shape the existing server parses.
 6. Verify: payload diff against the phase 0 capture, create/update/delete round-trip against the
    real backend, sort, filter, page, scroll to the end of a large result set.
+7. Comment any setting that exists only to preserve the Ext 4 wire format — `writeAllFields: true`,
+   a pinned `filterParam`, an explicit `identifier` — per the JSDoc rule in
+   `overrides-and-custom-components.md` section 7. A future reader deletes an unexplained
+   compatibility setting.

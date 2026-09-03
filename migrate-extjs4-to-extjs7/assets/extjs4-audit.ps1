@@ -517,7 +517,7 @@ foreach ($cs in $classpathSources) {
 
 # Sencha Cmd merges its generated code into app.js. A leftover merge marker is direct evidence
 # that the merge already failed here once, which belongs in the upgrade-in-place versus
-# transplant decision (SKILL.md step 10) rather than being discovered during it.
+# transplant decision (SKILL.md, phase 1) rather than being discovered during it.
 $mergeMarkers = @()
 foreach ($mh in ($files | Select-String -Pattern '^(<{7}|>{7})' -ErrorAction SilentlyContinue)) {
     $mergeMarkers += [pscustomobject]@{
@@ -602,7 +602,7 @@ if ($mergeMarkers) {
     Write-Host 'Unresolved code-generation merge markers:' -ForegroundColor Red
     $mergeMarkers | Format-Table -AutoSize
     Write-Host 'Cmd code generation already failed to merge here. Evidence for the upgrade-in-place versus' -ForegroundColor Red
-    Write-Host 'clean-scaffold-and-transplant decision; see SKILL.md step 10.' -ForegroundColor Red
+    Write-Host 'clean-scaffold-and-transplant decision; see SKILL.md, phase 1.' -ForegroundColor Red
     Write-Host ''
 }
 

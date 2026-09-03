@@ -18,10 +18,18 @@ or test environment.
 
 Use the current task and acceptance criteria to identify one completed boot slice,
 screen, workflow, or explicitly bounded batch. Discover and follow applicable
-`AGENTS.md` files and project migration rules. When available, use the producer
-skill `migrate-extjs4-to-extjs7` and load only its Verification section plus the
-current slice's relevant migration artifacts:
+`AGENTS.md` files and project migration rules.
 
+Read the migration's own artifacts, not the instructions of whatever skill produced
+them. This gate is independent evidence, and a gate that loads the implementer's
+skill inherits the implementer's framing and thresholds. Load the acceptance
+contract plus the current slice's records:
+
+- the **acceptance contract**: target Ext and Cmd release, toolkit, theme,
+  architecture, the visual and console thresholds, the canonical build command and
+  profile, the server test suite, and where baseline evidence lives. Every threshold
+  this gate applies comes from here. If it is missing or unfilled, return
+  `INCOMPLETE` and say which rows are absent — do not substitute a default;
 - screen-universe and verification-run rows;
 - Ext 4 screenshots and console capture;
 - endpoint-contract rows and captured request/response evidence;
@@ -50,19 +58,19 @@ Before testing, prove that the browser receives the current slice. Use a build o
 artifact hash, timestamp, deployment log, version marker, source map, or behavior
 unique to the change. Also capture these runtime facts from the served application:
 
-- `Ext.getVersion().version` is the intended target (the producer skill currently
-  fixes it at **7.7.0.31**);
-- the classic toolkit, intended theme, live page shell, locale, and build profile
-  are the ones approved for the migration;
+- `Ext.getVersion().version` matches the target release named in the acceptance
+  contract;
+- the toolkit, theme, live page shell, locale, and build profile are the ones the
+  acceptance contract names;
 - the bundle and stylesheets were loaded from the current deployment, with no
   unexpected Ext 4 framework artifact mixed into the boot path.
 
 Source configuration alone does not prove runtime freshness or the live boot path.
-The one exception is which shell an entry point is served: the hosting application's
-routing code settles that deterministically when cited by file and line, and the
-producer skill accepts it as evidence. Everything else here — freshness, the doctype
-as served, the profile actually fetched, the live locale — is a runtime fact. If it
-cannot be established, return `INCOMPLETE`.
+One exception: which shell an entry point is served is settled deterministically by
+the hosting application's routing code, cited by file and line, and that counts as
+evidence here. Everything else — freshness, the doctype as served, the profile
+actually fetched, the live locale — is a runtime fact. If it cannot be established,
+return `INCOMPLETE`.
 
 Run the project's canonical build for the profile the live shell serves when the
 gate includes build acceptance or no trustworthy successful build record exists.
@@ -120,47 +128,31 @@ sort/filter/paging/scrolling/selection/editing, and print/export/download behavi
 
 ### The visual check
 
-The bar is **structural, not pixel parity** — see the deferral below. Take the
-screenshot, and answer three questions against it and the Ext 4 baseline:
+Take the screenshot, then work the visual threshold the acceptance contract defines
+— its questions and its closed artifact list, including any artifact the project
+added there. **Report which threshold you applied.** The contract is the only copy;
+if it is unfilled you are already returning `INCOMPLETE` and there is nothing here
+to fall back on.
 
-1. **Is every component present?** The grid and its columns, the toolbar and its
-   buttons, the form and its fields, the tree, the paging bar, the status bar. A
-   component that is absent, or present in the DOM but not rendered, is a `FAIL`.
-2. **Is the data present and right?** Grid rows, form field values, tree children,
-   summary and total rows, and the paging count. Compare row counts against the
-   **HTTP response**, not against the screenshot: Ext 5+ buffered rendering only
-   puts visible rows in the DOM, so a short-looking grid is normal and a screenshot
-   cannot tell you the store loaded. Populated in Ext 4 and empty now is a `FAIL`,
-   and it is the signature of the reader `root` to `rootProperty` break, which
-   empties a grid with no exception and a 200 response.
-3. **Any significant artifact?** A closed list, so that "significant" is not a
-   judgment call:
-   - content overlapping, clipped, or drawn outside its container;
-   - a panel, grid, or region collapsed to zero or near-zero height or width;
-   - unstyled or raw markup, which means the theme stylesheet did not load;
-   - a missing image or icon — confirm against theme-resource 404s in the network
-     log, since a renamed theme image produces no console error;
-   - text overflowing rather than wrapping or ellipsing;
-   - a scrollbar where the Ext 4 screen had none, or content unreachable because one
-     is missing;
-   - a dialog or menu rendered off-screen, behind its own mask, or unclosable.
+Two of its questions need a technique the contract does not supply:
 
-Any one of those is a `FAIL`. The Ext 4 baseline is the **reference** for answering
-these three questions — "did this screen have a scrollbar before?" — not a diff
-target.
+- **Row counts come from the HTTP response, never the screenshot.** Ext 5+ buffered
+  rendering only puts visible rows in the DOM, so a short-looking grid is normal and
+  a screenshot cannot tell you whether the store loaded.
+- **A missing icon is confirmed in the network log**, as a theme-resource 404. A
+  renamed theme image raises no console error, so nothing else will surface it.
 
-**Deliberately deferred, and recorded rather than passed:** pixel-level parity,
-font metrics and anti-aliasing, spacing within a few pixels, exact colors, borders
-and radii, and the hover, focus, disabled, invalid-field, selected-row and
-print-stylesheet states. `theme-classic` is not visual parity and the difference is
-real, so note in the report that parity was not assessed at this level. Do not
-report it as compared and equivalent.
+Consequences, which are this gate's to enforce:
 
-Two things this lower bar does not license. Do not accept a new baseline or edit an
-existing one to make a slice pass — the threshold was lowered deliberately and in
-writing, which is the opposite of a slice quietly relaxing it. And do not restyle:
-a difference you happen to prefer is still a difference, and this gate is not where
-it gets adopted.
+- any artifact on the contract's list is a `FAIL`, and so is a component absent or
+  present-but-unrendered, or data populated in Ext 4 and empty now;
+- the Ext 4 baseline is the **reference** for answering the questions — "did this
+  screen have a scrollbar before?" — not a diff target;
+- whatever the contract defers is reported *not assessed*. Never as compared and
+  equivalent;
+- do not accept a new baseline or edit an existing one to make a slice pass, and do
+  not restyle. A difference you happen to prefer is still a difference, and this is
+  not where it gets adopted.
 
 ### The HTTP contract comparison
 

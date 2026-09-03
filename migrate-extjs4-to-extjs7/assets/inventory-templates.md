@@ -1,10 +1,73 @@
 # Inventory templates
 
-Seven artifacts. The first six are produced in phase 0 and kept current through phase 4; the seventh
-is written only when an exception is proposed, and only before it is implemented. Each one exists
-because the alternative is re-deriving the same facts under time pressure in the middle of a slice.
+Eight artifacts. Section 0 is the acceptance contract and is written first. Sections 1 to 6 are
+produced in phase 0 and kept current through phase 4. Section 7 is written only when an exception is
+proposed, and only before it is implemented. Each one exists because the alternative is re-deriving
+the same facts under time pressure in the middle of a slice.
 
 Keep them in the repository, next to the audit JSON baseline, and diff them at every phase boundary.
+
+**These artifacts are the contract between the migration skill and the verification gate.** Neither
+skill reads the other — the one that implements writes these files, and the one that verifies reads
+them. That is deliberate: a gate that loaded the implementer's instructions would inherit its
+framing and stop being independent evidence. So anything both sides need to agree on lives here, in
+section 0, and not in either skill.
+
+## 0. Acceptance contract
+
+Written before the first slice and changed only deliberately. Rows marked *fixed* come from the
+migration's settled decisions and are pre-filled; the rest are project facts that phase 0 and 0b
+establish. A verification run against a missing or unfilled contract is `INCOMPLETE`, not a pass.
+
+| Field | Value |
+|---|---|
+| Target Ext release | *fixed:* 7.7.0.31 |
+| Target Cmd release | *fixed:* `@sencha/cmd@7.7.0` (`version_full` 7.7.0.36) |
+| Toolkit | *fixed:* classic |
+| Theme | *fixed:* `theme-classic` — the closest baseline to Ext 4, not parity |
+| Architecture | *fixed:* global `Ext.app.Controller` MVC preserved; no ViewController, ViewModel, or `bind` |
+| Visual threshold | *fixed for this pass:* **structural**. See below. |
+| Console threshold | *fixed:* zero uncaught exceptions, zero **unaccounted** warnings. Classified deprecated-but-present warnings may remain when section 4 records their call sites and verified target-release status. |
+| Canonical build command and profile | The command that actually produces what gets deployed, and the profile the deployed shell really serves — from section 5 and section 6a, not assumed |
+| Server test suite and command | The hosting application's own suite, or `none` with the reason |
+| Baseline evidence location | Where the phase 0 screenshots, HTTP captures, and console baseline live |
+| Contract last reviewed | Date, and by whom |
+
+### The visual threshold
+
+**Structural for this pass.** A screen passes on three questions, in order:
+
+1. **Every component present** — grid and columns, toolbar and buttons, form and fields, tree,
+   paging bar. Absent, or in the DOM but not rendered, fails.
+2. **Data present and correct** — rows, field values, tree children, summary rows, paging count.
+   Compare row counts against the **HTTP response**, never against the screenshot: Ext 5+ buffered
+   rendering only puts visible rows in the DOM, so a short-looking grid is normal and a screenshot
+   cannot tell you the store loaded. Populated in Ext 4 and empty now fails, and is the signature of
+   the reader `root` to `rootProperty` break, which empties a grid with a 200 and no exception.
+3. **No significant artifact**, from this closed list, so that "significant" is not a judgment call:
+   - content overlapping, clipped, or drawn outside its container;
+   - a panel, grid, or region collapsed to zero or near-zero height or width;
+   - unstyled or raw markup, meaning the theme stylesheet did not load;
+   - a missing image or icon — confirm against theme-resource 404s in the network log, since a
+     renamed theme image produces no console error;
+   - text overflowing rather than wrapping or ellipsing;
+   - a scrollbar where the Ext 4 screen had none, or content unreachable because one is missing;
+   - a dialog or menu rendered off-screen, behind its own mask, or unclosable.
+
+Add project-specific artifacts to that list here rather than deciding them per run. This is the
+only copy: the verification gate works from this list rather than restating it, so an artifact that
+is not written down here is not gated on.
+
+**Deferred, and recorded rather than passed:** pixel-level parity, font metrics and anti-aliasing,
+spacing within a few pixels, exact colors, borders and radii, and the hover, focus, disabled,
+invalid-field, selected-row and print-stylesheet states. A run reports parity as *not assessed* —
+never as compared and equivalent.
+
+Phase 0 screenshots are still captured for every screen. At this threshold they are the reference
+for answering question 3 — "did this screen have a scrollbar before?" — and they are the diff target
+if the bar is raised later. Raising it is separately authorized work: it means pinning the viewport
+and device pixel ratio, capturing the deferred states, and setting a pixel tolerance plus a rule for
+what that tolerance may never absorb.
 
 ## 1a. Screen universe
 
