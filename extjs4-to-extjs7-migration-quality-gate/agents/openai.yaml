@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ext JS 4 to 7 Migration Quality Gate"
+  short_description: "Runtime-gate migrated Ext JS behavior"
+  default_prompt: "Use $extjs4-to-extjs7-migration-quality-gate to verify the current Ext JS 4-to-7 migration slice in the running application."
