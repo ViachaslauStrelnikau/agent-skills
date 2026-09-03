@@ -16,9 +16,9 @@ migration is.
 
 The specific errors this procedure prevents, all of which have been observed:
 
-| Question | What source text gives you | What the browser gives you |
+| Question | What the web content tree gives you | What settles it |
 |---|---|---|
-| Which shell is live? | every candidate, unranked — the choice is usually made in the hosting application's controller, outside the web content tree | the document request URL |
+| Which shell is live? | every candidate, unranked | the document request URL (tier 1), or the hosting application's routing code (tier 2) |
 | Microloader or prebuilt bundle? | Cmd's `x-compile` / `x-bootstrap` markers, which are *live directives written as HTML comments* and say who manages the page, not what it loads | whether `bootstrap.js` was requested at all |
 | Which build profile is deployed? | any `build/<profile>/` string in the file, including ones in comments | the bundle URL actually fetched |
 | Doctype | the doctype in the source file, which a build step may rewrite | `document.doctype` on the served page |
@@ -40,10 +40,34 @@ existing Playwright configuration, specs, authentication setup, fixtures, base U
 CLI command. Do not improvise an unrelated browser harness, and do not add a test runner to a
 project that has none.
 
-If neither mechanism can reach the application, authenticate, or capture the evidence, record each
-exact attempt and its failure reason and return the phase `INCOMPLETE`. **Do not fall back to
-inferring the boot path from source.** An unverified boot path is the thing this procedure exists
-to prevent; a source-derived guess presented as a finding is worse than a recorded gap.
+### Evidence tiers
+
+Three tiers, in descending order of authority. Use the best one available, and record which tier
+each fact came from.
+
+1. **A browser against the running application.** The only tier that settles everything below, and
+   the only one that can answer what was actually fetched and in what order.
+2. **The hosting application's own routing code**, cited by file and line. This skill says
+   repeatedly that the shell choice normally lives outside the web content tree — so when that code
+   is readable, it *is* evidence, not a guess:
+
+   ```java
+   // Login4Controller.java:48 - deterministic: two entry points, two shells
+   return production ? "jsp/Menu4-prod" : "dev";
+   ```
+
+   A one-line dispatch like that settles which shell each entry point serves more cheaply and more
+   durably than a capture does, and it distinguishes the live shells from the plausible-looking ones
+   nothing serves. What it does **not** settle: the doctype as served, the request waterfall, which
+   build profile the served page really points at once a build step has rewritten it, or which
+   locale files are actually requested. Those still need tier 1.
+3. **Nothing.** Record the phase `INCOMPLETE`, naming each exact attempt and its failure reason.
+
+**Never a fourth tier.** Picking the most plausible-looking shell out of the web content tree is not
+evidence at any strength, and a source-derived guess presented as a finding is worse than a recorded
+gap. Tier 2 is the hosting application *telling* you which file it serves; reading the candidate
+files themselves and reasoning about which looks live is the thing this procedure exists to
+prevent.
 
 Playwright does not emit `requestfailed` for completed 4xx/5xx responses. Inspect response statuses
 separately from transport failures.
@@ -82,7 +106,8 @@ offers.
 ## 4. Output, and what disagreement means
 
 Write the capture to JSON next to the audit script's JSON baseline, and commit both. Diff each at
-every phase boundary.
+every phase boundary. Record the evidence tier per fact, so a later reader can tell an observation
+from a deterministic dispatch from an outstanding gap.
 
 The two files overlap deliberately. The audit script reports `LoadsCandidate`, `ProfileCandidate`,
 `DoctypeSource`, and `Liveness = undetermined`; this capture reports the observed value for each.

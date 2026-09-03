@@ -119,9 +119,17 @@ console output, which is exactly what the phase 0 screenshots exist to catch.
 
 ## 7. Verification for theming work
 
+This is the bar for **deliberate theming work** — someone editing the theme package, a SASS
+variable, or a `.x-` selector. It is deliberately higher than the migration-wide visual gate, which
+is structural for this pass (`SKILL.md`, Fixed decisions, Visual threshold). Touching the style
+pipeline is the one activity where the deferred items are the whole point of the change, so they
+come back into scope for it.
+
 - Fashion build clean, no missing-variable or missing-function errors.
-- Side-by-side screenshot comparison against the phase 0 baseline for every screen, at the
-  resolutions the users actually run.
+- Side-by-side screenshot comparison against the phase 0 baseline for every screen the change can
+  reach, at the resolutions the users actually run, with the viewport pinned to the baseline's.
 - Check the states that screenshots miss: hover, focus, disabled, invalid fields, selected grid
   rows, collapsed panels, and any print stylesheet.
-- Missing-image check: no 404s for theme resources in the network log.
+- Missing-image check: no 404s for theme resources in the network log. This one is **not** deferred
+  anywhere: a renamed theme image is a missing icon with no console error, so it is on the
+  structural gate's artifact list too.

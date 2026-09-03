@@ -182,7 +182,8 @@ The properties that matter here:
 ```
 
 - `toolkit` must be `classic`. Nothing in this migration targets modern.
-- `theme` is `theme-classic` for visual parity. See `theming-and-sass.md`.
+- `theme` is `theme-classic`, the closest available baseline to the Ext 4 look. Not parity - see
+  `theming-and-sass.md`, and the visual threshold in `SKILL.md`.
 - `requires` must list `ux` if any `Ext.ux` class is used, and `charts` if any chart exists. Both
   were split out of the framework in Ext 6 and neither loads implicitly. Remove `ext-aria`, which no
   longer exists.
@@ -244,8 +245,10 @@ Two documented coverage limits, both material:
   contradict it. Every finding is a research pointer, not a defect.
 - **It only analyzes classes that extend Ext classes.** A custom base class that extends another
   custom class is not properly analyzed, so an application with its own component hierarchy has a
-  blind spot exactly where its most bespoke code lives. Cover that code by reading it, not by
-  trusting a clean report.
+  blind spot exactly where its most bespoke code lives — and, because those are base classes, where
+  the most other code depends on it. Cover it deliberately: rank the local inheritance graph and
+  read the top of it by hand, per `overrides-and-custom-components.md` section 2a. A clean report
+  over a codebase with its own `AbstractWindow` hierarchy is not evidence about that hierarchy.
 
 Run it in phase 0 to size the work, and again at every phase boundary.
 
@@ -355,5 +358,11 @@ these as *candidates* for exactly this reason.
 - The ESLint finding count is recorded per phase. A finding verified as deprecated-but-present on
   7.7.0 moves to the accepted-debt inventory rather than counting against the phase. What must not
   rise is the count of *unclassified* findings.
+- **The hosting application's own test suite is a migration gate**, where it has one. This upgrade
+  is not supposed to change a single request the backend receives, which makes the backend's tests
+  the cheapest available evidence that it did not – and the only automated evidence covering the
+  writer changes, which carry the highest data-loss risk in the migration and raise nothing on the
+  client. Run the suite the project documents after any slice touching a reader, writer, proxy, or
+  id format, and record the result. A failure there is a defect in the slice, not a test to update.
 - The CI image needs: Java 8+ (8–21 for Cmd 7.8), Node 8+ and npm 5+, Sencha Cmd 7.x, and the
   framework available to the build. Ruby comes out once the Ext 4 build is retired.

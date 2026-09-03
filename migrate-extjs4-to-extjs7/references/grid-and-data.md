@@ -18,6 +18,7 @@ that writes.
 | `persistenceProperty` | Removed |
 | `validations` array | `validators`, and per-field `validators` config |
 | `belongsTo`, `hasMany`, `associations` | Field-level `reference` config, resolved through `Ext.data.schema.Schema` |
+| `Ext.ModelManager` (Ext 4 root alias) | **Removed.** Sencha's own removed-class lint rule uses it as the worked example. Resolve models through the schema or `Ext.ClassManager`. |
 | `Ext.data.ModelManager` | Deprecated; the schema owns model and association registration |
 | `Ext.data.Types` static type registry | Deprecated; fields are classes under `Ext.data.field.*` |
 | Field `useNull` | `allowNull` |
@@ -98,7 +99,7 @@ Handlers written against the per-record Ext 4 signatures are the common failure:
 | `Ext.data.Operation` single class | Split into four CRUD subclasses |
 | `proxy.doRequest(operation, callback, scope)` | Takes a single Operation argument |
 | `proxy.extraParams.foo = x` | `setExtraParams()` / `getExtraParams()` |
-| `Ext.data.writer.Json.getExpandedData()` | Removed (Ext 6) |
+| `Ext.data.writer.Json.getExpandedData()` | **Present, and documented as protected** in 7.7.0 (checked 2026-09-03). Not removed. Calling it couples the application to a protected member: keep it, comment the coupling, and payload-test it. |
 
 ### `root` is two different statuses, not one
 

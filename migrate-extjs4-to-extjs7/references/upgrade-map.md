@@ -101,15 +101,23 @@ digit — now throw. Audit every place an id is built from a database key or a J
 or `Ext.fly()`. The `forceNew` constructor parameter is gone, `Ext.fly()` returns null for text
 nodes, and listeners cannot be attached to flyweights. Removed or deprecated methods include
 `getAttributeNS`, `isDisplayed`, `getStyleSize`, `getComputedWidth`, `getComputedHeight`,
-`setLeftTop`, `setBounds`, `isBorderBox`, `relayEvent`, `isTransparent`, `getHTML`, `replaceWith`,
-and `setRegion`.
+`setLeftTop`, `setBounds`, `isBorderBox`, `relayEvent`, `isTransparent`, `replaceWith`, and
+`Ext.dom.Element`'s own `setRegion` — which is **not** the `Ext.Component.setRegion()` named as the
+`setBorderRegion()` replacement in section 3; check the receiver before acting on either.
+
+`getHTML` is a **case rename, not a removal**: Ext 7 classic spells it `getHtml()`. The audit script
+flags it under removed Element methods because the Ext 4 spelling does fail, and a hit on the boot
+path is still a hard boot failure — a server-injected value read as
+`Ext.get('someId').getHTML()` breaks before the application paints. Fix the casing rather than
+redesigning the read.
 
 ## 3. Components, containers, layout
 
 | Ext 4 | Ext 7 | Status |
 |---|---|---|
-| `margins`, layout `defaultMargins` | `margin` | Removed |
-| `setBorderRegion()` | `setRegion()` | Removed |
+| Component `margins` | `margin`, on the same component | Removed |
+| Box-layout `defaultMargins` | **Not** `margin` on the layout. Move the value to the owning container's `defaults: { margin: … }`, then compare the screen against its phase 0 screenshot. | Removed |
+| `setBorderRegion()` | `Ext.Component.setRegion()` (a border-layout component method, unrelated to the removed `Ext.dom.Element.setRegion`) | Removed |
 | `setRegionWeight()` | `setWeight()` | Removed |
 | `doLayout()` | `updateLayout()` | Removed in Ext 6 |
 | `header.title` (string) | `header.getTitle().getText()` — the title is an `Ext.panel.Title` component, and the icon lives inside it | Changed signature |
@@ -117,6 +125,11 @@ and `setRegion`.
 | Container `move` event | Container `childmove` (resolves the clash with Component `move`) | Changed signature |
 | `Ext.layout.container.Table` `cellId` | `cellCls` | Removed |
 | `autoScroll` | `scrollable` | Receiver-dependent — verify per release and per class whether `autoScroll` still forwards; the two configs are not value-compatible (`autoScroll: true` maps to `scrollable: true`, but `scrollable` also takes `'x'`, `'y'`, and config objects) |
+
+`margins` and `defaultMargins` share a search term and do not share a fix. `margins:` matches
+inside `defaultMargins:`, so a single grep conflates a per-item rename with a container-level
+restructure that changes which component owns the value. Split the hits before estimating, and treat
+every `defaultMargins` site as a layout change needing a visual check rather than a rename.
 
 `liquidLayout` defaults to true, so buttons and form fields size with CSS instead of a JavaScript
 layout pass. Custom components that measured or corrected their own sizing in Ext 4 are the usual

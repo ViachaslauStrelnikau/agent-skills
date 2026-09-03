@@ -35,6 +35,34 @@ Carry this inventory as a working document for the whole migration. Each entry e
 states: deleted (with the reason it is no longer needed), ported (with the reason it is still
 needed), or replaced by a supported API.
 
+## 2a. Rank the local inheritance graph (phase 0)
+
+Overrides are not the only place a single edit fans out. On a long-lived Ext 4 codebase the
+application grows its own base classes — an `AbstractWindow`, a `BaseList`, a `DocsForm` — and each
+one carries every subclass with it. A base class with sixty subclasses is sixty screens behind one
+fix, in both directions: fixing it early is leverage, and breaking it late is a bad afternoon.
+
+This matters here rather than in a general migration-order discussion because of a documented tool
+limitation: `@sencha/eslint-plugin-extjs` **only properly analyzes classes that extend Ext classes**
+(`tooling-and-build.md` section 6). A custom class whose own base is custom is not analyzed, so the
+plugin's blind spot is exactly the application's most bespoke component hierarchy — the code with
+the most subclasses depending on it. A clean lint report says nothing about it.
+
+Procedure:
+
+1. Extract every `extend:` value from the application source and keep the ones that name an
+   application class rather than an `Ext.*` class.
+2. Count subclasses per base, transitively, and sort descending. That ordering is the migration
+   order for views, the same way shared stores and models order the data work.
+3. Read the top of that list by hand, against the Ext 7 source of whatever Ext class the chain
+   eventually reaches. These are the classes the linter skipped.
+4. Migrate and verify a base class **before** any subclass, and verify it through at least two
+   different subclasses — a base class that renders correctly in one screen and not another is
+   usually depending on a layout or config-order behavior that changed underneath it.
+
+Record the ranking with the override register. It is short-lived working memory: once the top bases
+are migrated, the fan-out risk is gone and the list stops earning its keep.
+
 ## 3. Re-deriving an override
 
 For each `must re-derive` entry:
@@ -115,6 +143,8 @@ UX classes were absorbed, replaced, or dropped. The two most commonly hit:
 ## 7. Definition of done for this area
 
 - Every inventory entry is in a terminal state: deleted, ported, or replaced by a supported API.
+- Every application base class in the top of the section 2a ranking is migrated and verified through
+  at least two subclasses, and was read by hand rather than cleared by the linter.
 - Every retained override and custom component carries the JSDoc required by the skill's comment
   rule: what framework behavior it modifies, and which Ext version last validated it.
 - No override targets a private member without a comment explaining why no supported alternative
