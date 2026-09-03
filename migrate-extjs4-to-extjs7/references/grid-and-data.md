@@ -11,7 +11,7 @@ that writes.
 
 | Ext 4 | Ext 7 |
 |---|---|
-| `raw` property holding the untouched source object | Removed. Use `data`. |
+| `raw` property holding the untouched source object | Removed — but `data` is not a substitute for it. See below. |
 | Undeclared fields pruned on load | Undeclared fields are retained |
 | `modified` returns `{}` when unchanged | Returns `undefined`. Use `isModified()`, `getModified()`, `getChanges()`. |
 | `destroy()` deletes on the server | `destroy()` releases client resources. `erase()` deletes on the server. `drop()` marks a record removed without saving. |
@@ -21,6 +21,20 @@ that writes.
 | `Ext.data.ModelManager` | Deprecated; the schema owns model and association registration |
 | `Ext.data.Types` static type registry | Deprecated; fields are classes under `Ext.data.field.*` |
 | Field `useNull` | `allowNull` |
+
+**`raw` is not `data`.** They diverge wherever a field declares `convert`, a `type` that coerces, or
+a `defaultValue`: `raw` holds the untouched response value and `data` holds the post-conversion one.
+A mechanical `.raw` → `.data` pass therefore changes values without raising anything, which is the
+worst way for a data migration to change a value. Resolve each call site instead:
+
+- one application value — `record.get('field')`, the public accessor, and the right answer nearly
+  every time;
+- the whole converted object, deliberately — `record.data`;
+- the original unconverted response, deliberately — configure the reader with the target release's
+  `keepRawData` equivalent, read it from the reader, and record why conversion has to be bypassed.
+
+Nested reads like `rec.raw.someList` deserve the hardest look: they are usually reaching for server
+structure that no field declares, so neither `get()` nor `data` will contain it.
 
 New field capabilities worth knowing while porting, but not worth adopting speculatively:
 `calculate` (auto-derives dependencies), `depends` (explicit dependency list for `convert`),
@@ -180,8 +194,21 @@ Ext 4's `Ext.ux.grid.FeatureFilter` style configuration is gone. Filtering is th
 
 The filter type is inferred from the model's field definition when omitted. In practice this touches
 nearly every column of every filtered grid — treat it as a mechanical pass with a per-grid
-verification, and confirm that the parameters sent to the server still match what the Java side
-parses.
+verification.
+
+**Remote filtering and sorting: the server's parser is the contract.** Where a store sets
+`remoteFilter` or `remoteSort`, do not assume the target release serializes filters and sorters the
+way Ext 4 did. The parameter names (`filterParam`, `sortParam`, `groupParam`, and the
+`directionParam` / `simpleSortMode` pair), the JSON shape of each encoded filter, and the encoders
+themselves (`encodeFilters` / `encodeSorters` on the proxy) are all configurable — and the backend
+parser is the side that cannot change. So capture the Ext 4 request first, then pin what the existing
+server expects explicitly on the existing proxy, parameter name and encoded shape both, rather than
+inheriting the target release's defaults. A filter that serializes differently returns the wrong rows
+under a 200 status, which no console gate and no exception handler will catch.
+
+Local filtering carries no such exposure. Confirm the store does not set `remoteFilter: true`, since
+client-side filtering is the default. `updateBuffer` from the Ext 4 feature belongs on the individual
+column filter, not on the plugin.
 
 ### Other grid changes
 
@@ -197,7 +224,8 @@ parses.
 
 ## 5. Porting checklist per store-backed screen
 
-1. Model: `raw` → `data`, `validations` → `validators`, associations → `reference`, `useNull` →
+1. Model: `raw` reads resolved per call site — `get()`, `data`, or `keepRawData`, never a blanket
+   `.raw` → `.data` — `validations` → `validators`, associations → `reference`, `useNull` →
    `allowNull`, remove `persistenceProperty`.
 2. Store: `buffered` → `type: 'buffered'`, `groupers` → `grouper`, review `add`/`remove` handlers
    for the new batched signatures.
@@ -205,6 +233,7 @@ parses.
    restore raw-envelope access with the target release's `keepRawData` equivalent.
 4. Proxy: `extraParams` through the setter; check `doRequest` overrides.
 5. Grid: filters to the plugin, `variableRowHeight` where rows vary, review string renderers, remove
-   `verticalScroller`.
+   `verticalScroller`. On a remote-filtered or remote-sorted store, pin the parameter names and the
+   encoded shape the existing server parses.
 6. Verify: payload diff against the phase 0 capture, create/update/delete round-trip against the
    real backend, sort, filter, page, scroll to the end of a large result set.

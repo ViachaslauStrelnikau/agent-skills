@@ -42,9 +42,12 @@ the Ext 4 original.
 
 The single exception is a **confirmed** Ext 7.7.0 incompatibility that cannot be repaired safely
 inside the existing class. Confirmed means verified against the target release, not inferred from an
-audit count or a mapping table. When that happens, record three things in the override register or
-audit triage: the incompatible API, its mapping status on 7.7.0, and **why the smaller edit was
-insufficient**. Absent that record, the smaller edit was not attempted.
+audit count or a mapping table. When that happens, fill in the exception record
+(`assets/inventory-templates.md` section 7) **before** writing the class: the incompatible API, the
+target-release evidence with its date, what was tried inside the existing class and how it failed,
+the smallest mechanism that works, the evidence that the server contract is unchanged, and the
+condition under which the new code is deleted. Absent that record, the smaller edit was not
+attempted.
 
 **The clean-scaffold option replaces generated infrastructure only** — `.sencha/`, the generated
 `app.json` and bootstrap, theme package scaffolding, and build configuration. Application classes
@@ -177,7 +180,7 @@ recorded as manually verified, never silently skipped.
 ## Resources
 
 - Run `assets/extjs4-audit.ps1` in phase 0 and at every phase boundary. It reports matching lines and match counts per change category, detects page shells and how each one boots, finds stylesheets coupled to framework markup and build scripts that wrap Cmd, and writes a machine-readable baseline to diff against.
-- Fill in `assets/inventory-templates.md` in phase 0: the screen universe and the verification-run log (kept as two tables so that coverage stays readable), the endpoint contract inventory, the override register, the audit triage, the build-customization inventory, and the boot-path and localization inventory. These are the migration's working memory.
+- Fill in `assets/inventory-templates.md` in phase 0: the screen universe and the verification-run log (kept as two tables so that coverage stays readable), the endpoint contract inventory, the override register, the audit triage, the build-customization inventory, and the boot-path and localization inventory. These are the migration's working memory. The seventh template, the exception record, is filled in only when a new class is proposed — before it is written, not after.
 - Follow `references/boot-path-evidence.md` in phase 0b to settle the boot path in a browser: which shell is served, what it loads, which profile is deployed, and which locale files are live. The audit script reports all of these as candidates; this is how they stop being guesses.
 - Read `references/upgrade-map.md` before planning or implementing any slice. It is the cumulative 4-to-7 API change map, with every entry labelled by mapping status.
 - Read `references/grid-and-data.md` before touching a grid, store, model, proxy, reader, or writer.

@@ -1,6 +1,7 @@
 # Inventory templates
 
-Six artifacts the migration produces in phase 0 and keeps current through phase 4. Each one exists
+Seven artifacts. The first six are produced in phase 0 and kept current through phase 4; the seventh
+is written only when an exception is proposed, and only before it is implemented. Each one exists
 because the alternative is re-deriving the same facts under time pressure in the middle of a slice.
 
 Keep them in the repository, next to the audit JSON baseline, and diff them at every phase boundary.
@@ -78,8 +79,9 @@ be deleted, not ported. If nobody knows the reason, that is itself a finding —
 
 "Why an in-place edit was insufficient" is required for any row whose decision adds something the
 application did not have — a wrapper, a new base class, a shim, a replacement component. The
-source-structure policy allows that only for a confirmed target-release incompatibility, and this is
-where the confirmation lives. An empty cell means the smaller edit was never attempted.
+source-structure policy allows that only for a confirmed target-release incompatibility. Summarize it
+here in one line and record the evidence in the exception record, section 7. An empty cell means the
+smaller edit was never attempted.
 
 ## 4. Audit triage
 
@@ -142,3 +144,25 @@ until phase 4; it is not a shell contract, it is a deletion candidate with its o
 living inside the vendored SDK need a `Rehomed to` destination before the SDK can be removed; the
 framework half is replaced by the target release's locale package and needs no row here beyond a
 count.
+
+## 7. Exception record
+
+One per added class, filled in **before** the class is written. The source-structure policy permits a
+new class only for a confirmed target-release incompatibility that cannot be repaired inside the
+class that already owns the behavior, and this is where that confirmation lives. The override
+register's "Why an in-place edit was insufficient" column is the one-line summary; this is the
+evidence behind it.
+
+| Field | Required content |
+|---|---|
+| Existing class and screen | The class that owns the behavior today, and the affected workflow |
+| Ext 4 dependency | The removed or private API, and the behavior relied upon |
+| Target-release evidence | What the target release's documentation, source, or a runtime check actually showed — with the release and the date |
+| Smaller edits attempted | What was tried inside the existing class, and how each attempt failed |
+| Proposed mechanism | The smallest new thing that works, and its blast radius |
+| Contract evidence | Proof that the server contract and the screen's observable behavior are unchanged |
+| Removal gate | The condition under which this code is deleted, and who owns that |
+
+The last two rows are the ones that get skipped, and they are the two that decide whether this stays
+an exception. Without a removal gate the workaround is permanent by default. And "it works" is not
+evidence that the payload is unchanged — only a payload diff is.
