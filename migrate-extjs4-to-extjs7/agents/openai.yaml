@@ -1,0 +1,4 @@
+interface:
+  display_name: "Migrate Ext JS 4 to Ext JS 7"
+  short_description: "Direct Ext JS 4 to 7 classic upgrade, MVC preserved"
+  default_prompt: "Use $migrate-extjs4-to-extjs7 to plan or implement a behavior-preserving upgrade from Ext JS 4 to the Ext JS 7 classic toolkit, keeping the existing Ext.app.Controller MVC structure and the Ext 4 appearance."

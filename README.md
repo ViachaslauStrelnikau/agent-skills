@@ -1,6 +1,6 @@
 # agent-skills
 
-Six agent skills for modernising legacy Java applications and for designing tests that are worth
+Seven agent skills for modernising legacy Java applications and for designing tests that are worth
 running. Written and used in production on a large Struts 2 → Spring migration.
 
 ## What a skill is
@@ -10,7 +10,7 @@ matches it. Instead of re-explaining a workflow in every prompt, the skill carri
 steps, the task modes, the guardrails, and a set of reference documents the agent reads only when
 the specific task needs them.
 
-These six were written while migrating a large, long-lived enterprise Java web application off
+These seven were written while migrating a large, long-lived enterprise Java web application off
 Struts 2 — hundreds of `.do` routes, a Hibernate 3 data layer, and an Ext JS front end, all with
 live users and no downtime budget. The method had to survive being applied several hundred times,
 by different sessions, without drifting. That is the part worth publishing; the application itself
@@ -23,13 +23,14 @@ is client-owned and private.
 | [`migrate-struts2-to-spring`](migrate-struts2-to-spring) | Analyse, plan, implement, diagnose, or review a staged migration from Struts 2 actions, JSPs, and interceptors to Spring MVC — one route and all of its clients as a single functional slice, preserving the observable HTTP contract. Ships a [route-catalog schema](migrate-struts2-to-spring/assets/route-mapping.yaml). |
 | [`struts2-to-spring-migration-quality-gate`](struts2-to-spring-migration-quality-gate) | Verify that a migrated slice actually works in the running application, from the API, client, and user perspective. Focused rule review, targeted build and tests, HTTP verification, browser E2E where UI integration matters, persistence checks for mutations. Returns exactly `PASS`, `FAIL`, or `INCOMPLETE`. |
 | [`hibernate-criteria-to-jpa-criteria`](hibernate-criteria-to-jpa-criteria) | Convert legacy `org.hibernate.Criteria`, `Restrictions`, `Projections`, `DetachedCriteria`, and result transformers to the standard JPA Criteria API — including the staged Hibernate 3/4 → 5.6 → 6+ route and the `javax` → `jakarta` namespace transition. |
+| [`migrate-extjs4-to-extjs7`](migrate-extjs4-to-extjs7) | Analyse, plan, implement, diagnose, or review a direct upgrade of a Sencha Cmd Ext JS 4 application to the Ext JS 7 classic toolkit, keeping the existing `Ext.app.Controller` MVC structure, the Ext 4 appearance (`theme-classic`), and every server contract. Phased so breakage is attributable, with an [audit script](migrate-extjs4-to-extjs7/assets/extjs4-audit.ps1) and a build, console, E2E, and manual gate per screen. |
 | [`java-tester`](java-tester) | Risk-focused Java test design, implementation, review, debugging, and CI placement. Unit, slice, integration, contract, Testcontainers, Spring Boot and Spring Security tests, with explicit test-pyramid decisions. |
 | [`front-end-angular-tester`](front-end-angular-tester) | Version-aware Angular (2+) testing across Vitest, Karma/Jasmine, and Jest; standalone or NgModule; zone-based or zoneless. Covers components, signals, `@defer`, forms, routing, guards, HTTP, accessibility, visual regression, and E2E. |
 | [`add-production-logging`](add-production-logging) | Audit, plan, add, or review production logging and observability without changing business behaviour. Preserves meaningful legacy events, removes duplicate and unsafe logging, and treats credentials and personal data as omissions by default. |
 
 ## Shared design conventions
 
-All six follow the same rules. They are the actual content of the repo — the domain knowledge is
+All seven follow the same rules. They are the actual content of the repo — the domain knowledge is
 the easy half.
 
 - **Read-only until asked.** Analysis, planning, review, and diagnosis modes do not edit. Only an
